@@ -1,7 +1,5 @@
 /* Browser-only Gemini tutor. The API key lives only in this page's memory. */
 function createGeminiTutor(settings) {
-  const model = 'gemini-3.8-flash';
-  const endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
   const styles = document.createElement('style');
   styles.textContent = `
     #anatomy-study-redesign .ai-panel { border:1px solid #d9e4f0; border-radius:12px; padding:10px; background:#fff; min-width:0 }
@@ -9,6 +7,7 @@ function createGeminiTutor(settings) {
     #anatomy-study-redesign .ai-panel form { display:grid; gap:8px; margin-top:8px }
     #anatomy-study-redesign .ai-panel label { font-weight:650 }
     #anatomy-study-redesign .ai-panel input,
+    #anatomy-study-redesign .ai-panel select,
     #anatomy-study-redesign .ai-panel textarea { width:100%; min-width:0; padding:8px; border:1px solid #bbcbe2; border-radius:8px; font:inherit; color:#223a59; background:#fff }
     #anatomy-study-redesign .ai-panel small { color:#53657d }
     #anatomy-study-redesign .ai-response { white-space:pre-wrap; overflow-wrap:anywhere; margin-top:8px }
@@ -16,6 +15,11 @@ function createGeminiTutor(settings) {
   document.head.append(styles);
   settings.innerHTML = `<details class="ai-panel"><summary>Gemini API 키 설정</summary>
     <form>
+      <label for="gemini-model">사용 모델</label>
+      <select id="gemini-model">
+        <option value="gemini-3.8-flash">Gemini 3.8 Flash</option>
+        <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite</option>
+      </select>
       <label for="gemini-user-key">내 API 키</label>
       <input id="gemini-user-key" type="password" autocomplete="off" spellcheck="false" required>
       <small>키는 새로고침하면 지워져요. 질문을 보내면 Google Gemini API가 처리해요.</small>
@@ -25,6 +29,7 @@ function createGeminiTutor(settings) {
     </form>
   </details>`;
 
+  const modelField = settings.querySelector('#gemini-model');
   const keyField = settings.querySelector('input');
   const keyStatus = settings.querySelector('[data-key-status]');
   let apiKey = '';
@@ -78,6 +83,8 @@ function createGeminiTutor(settings) {
       }
 
       cancel();
+      const model = modelField.value;
+      const endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
       const request = new AbortController();
       activeRequest = request;
       submit.disabled = true;
@@ -109,7 +116,8 @@ function createGeminiTutor(settings) {
           if (result.status === 400 || result.status === 401 || result.status === 403) {
             throw new Error('API 키와 Gemini 모델 사용 권한을 확인해 주세요.');
           }
-          if (result.status === 404) throw new Error('이 키로 Gemini 3.8 Flash 모델을 사용할 수 있는지 확인해 주세요.');
+          if (result.status === 404) throw new Error('이 키로 ' + model + ' 모델을 사용할 수 있는지 확인해 주세요.');
+          if (result.status === 503) throw new Error(model + ' 서비스가 일시적으로 응답할 수 없어요. 잠시 후 다시 시도하거나 다른 모델을 선택해 주세요.');
           if (result.status === 429) throw new Error('호출 한도에 도달했어요. 잠시 후 다시 시도해 주세요.');
           throw new Error('Gemini 요청에 실패했어요. 잠시 후 다시 시도해 주세요.');
         }
