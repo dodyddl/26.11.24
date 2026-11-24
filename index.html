@@ -92,7 +92,8 @@
 #anatomy-study-redesign .study-back,#anatomy-study-redesign .study-primary{padding:8px 15px;border-radius:11px;font-weight:700}
 #anatomy-study-redesign .study-back{border:1px solid var(--line);background:white}
 #anatomy-study-redesign .study-primary{border:1px solid transparent;background:var(--navy);color:white}
-#anatomy-study-redesign .study-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px}
+#anatomy-study-redesign .study-actions{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+#anatomy-study-redesign .study-actions [data-next]{margin-inline-start:auto}
 #anatomy-study-redesign .study-actions:not(:has(> button:not([hidden]))){display:none}
 @keyframes study-reveal{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){#anatomy-study-redesign .study-feedback{animation:none}}
@@ -103,7 +104,6 @@
 }
 @media(max-width:370px){
   #anatomy-study-redesign .study-rail{grid-template-columns:1fr}
-  #anatomy-study-redesign .study-actions button{flex:1 1 auto}
 }
 #anatomy-study-redesign .study-settings{display:grid;gap:7px;min-width:0}
 #anatomy-study-redesign .study-settings label{font-size:13px;font-weight:700}
